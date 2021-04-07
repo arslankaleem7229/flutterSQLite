@@ -77,4 +77,14 @@ class DataBaseHelper {
     return await dbClient
         .delete("$table", where: "$columnId = ?", whereArgs: [index]);
   }
+
+  Future<int> updateData(User user) async {
+    var dbClient = await database;
+    return await dbClient.update("$table", user.toMap(),
+        where: "$columnId = ?", whereArgs: [user.id]);
+  }
+
+  Future close() async {
+    var dbClient = await database;
+  }
 }
