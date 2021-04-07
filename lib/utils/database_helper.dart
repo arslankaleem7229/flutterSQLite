@@ -19,12 +19,11 @@ class DataBaseHelper {
   static Database _database;
 
   Future<Database> get database async {
-    if (database != null) {
-      return _database;
-    } else {
-      _database = await initdb();
+    if (_database != null) {
       return _database;
     }
+    _database = await initdb();
+    return _database;
   }
 
   DataBaseHelper.internal();
@@ -39,7 +38,7 @@ class DataBaseHelper {
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE $table($columnId INTERGER PRIMARY KEY, $columnName TEXT , $columnPassword TEXT)");
+        "CREATE TABLE $table($columnId INTEGER PRIMARY KEY, $columnName TEXT , $columnPassword TEXT)");
   }
 
   Future<int> saveUser(User user) async {
@@ -61,15 +60,13 @@ class DataBaseHelper {
     );
   }
 
-  Future<User> getUser(int index) async {
+  Future<User> getUser(int id) async {
     var dbClient = await database;
-    var result = await dbClient
-        .rawQuery("SELECT * FROM $table WHERE $columnId = $index");
-    if (result.length == 0) {
-      return null;
-    } else {
-      new User.fromMap(result.first);
-    }
+    var result =
+        await dbClient.rawQuery("SELECT * FROM $table WHERE $columnId = $id");
+    print(result.length);
+    if (result.length == 0) return null;
+    return new User.fromMap(result.first);
   }
 
   Future<int> deleteUser(int index) async {
@@ -86,5 +83,6 @@ class DataBaseHelper {
 
   Future close() async {
     var dbClient = await database;
+    return dbClient.close();
   }
 }
